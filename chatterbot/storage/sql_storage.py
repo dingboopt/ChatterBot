@@ -64,6 +64,7 @@ class SQLStorageAdapter(StorageAdapter):
 
             @event.listens_for(Engine, "connect")
             def set_sqlite_pragma(dbapi_connection, connection_record):
+                dbapi_connection.text_factory = str
                 dbapi_connection.execute('PRAGMA journal_mode=WAL')
                 dbapi_connection.execute('PRAGMA synchronous=NORMAL')
 
