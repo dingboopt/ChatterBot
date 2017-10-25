@@ -90,7 +90,7 @@ class ChatBot(object):
         """
         self.logic.initialize()
 
-    def get_response(self, input_item, conversation_id=None):
+    def get_response(self, input_item, conversation_id=None, learn_response=False):
         """
         Return the bot's response based on the input.
 
@@ -115,7 +115,7 @@ class ChatBot(object):
         # Learn that the user's input was a valid response to the chat bot's previous output
         previous_statement = self.storage.get_latest_response(conversation_id)
 
-        if not self.read_only:
+        if not self.read_only and learn_response:
             self.learn_response(statement, previous_statement)
             self.storage.add_to_conversation(conversation_id, statement, response)
 
