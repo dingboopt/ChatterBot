@@ -118,3 +118,17 @@ class Conversation(Base):
         secondary=lambda: conversation_association_table,
         backref='conversations'
     )
+
+
+class Sentence(Base):
+    """
+    A Sentence in a conversation.
+    """
+    text = Column(String)
+
+    channel = Column(String)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )

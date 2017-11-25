@@ -32,6 +32,18 @@ class Trainer(object):
 
         return statement
 
+    def get_or_create_within_channel(self, statement_text):
+        """
+        Return a statement if it exists.
+        Create and return the statement if it does not exist.
+        """
+        statement = self.storage.find(statement_text)
+
+        if not statement:
+            statement = Statement(statement_text)
+
+        return statement
+
     class TrainerInitializationException(Exception):
         """
         Exception raised when a base class has not overridden
@@ -394,3 +406,37 @@ class UbuntuCorpusTrainer(Trainer):
 
                         previous_statement_text = statement.text
                         self.storage.update(statement)
+
+
+class WechatTrainer(Trainer):
+    """
+    Allows the chat bot to be trained using data from the
+    wechat.
+    """
+
+    def __init__(self, storage, **kwargs):
+        super(WechatTrainer, self).__init__(storage, **kwargs)
+
+    def train(self, msg, me):
+
+        """
+        Train the chat bot based on the provided list of
+        statements that represents a single conversation.
+        """
+
+        # reply, learn
+        if me:
+            channel = msg['ToUserName']
+            previous_statement_text = self.storage.find_within_channel(channel)
+            # store in statement if previous one is a response of mine
+            if previous_statement_text is not None:
+                statement = self.get_or_create(msg['Text'])
+                statement.add_response(
+                    Response(previous_statement_text)
+                )
+                self.storage.update(statement)
+            self.storage.delete_within_channel(channel)
+        #receive message
+        else:
+            channel = msg['FromUserName']
+            self.storage.update_sentence_with_channe(msg['Text'], channel)

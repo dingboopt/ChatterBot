@@ -141,6 +141,46 @@ class SQLStorageAdapter(StorageAdapter):
         session.close()
         return None
 
+    def find_within_channel(self, channel_id):
+        from sqlalchemy import desc
+        from chatterbot.ext.sqlalchemy_app.models import Sentence
+
+        session = self.Session()
+        sentence = session.query(Sentence).filter_by(
+            channel=channel_id
+        ).order_by(desc(Sentence.id)).first()
+        if sentence is None:
+            return None
+        text = sentence.text
+        session.close()
+        return text
+
+    def delete_within_channel(self, channel_id):
+        from chatterbot.ext.sqlalchemy_app.models import Sentence
+
+        session = self.Session()
+        session.query(Sentence).filter_by(
+            channel=channel_id
+        ).delete()
+
+        self._session_finish(session)
+
+    def update_sentence_with_channe(self, text, channel_id):
+        from chatterbot.ext.sqlalchemy_app.models import Sentence
+        from sqlalchemy import desc
+
+        session = self.Session()
+        sentence = session.query(Sentence).filter_by(
+            channel=channel_id
+        ).order_by(desc(Sentence.id)).first()
+        if sentence is None:
+            new_sentence = Sentence(text=text, channel=channel_id)
+            session.add(new_sentence)
+        else:
+            sentence.text = sentence.text + text
+        self._session_finish(session)
+        return
+
     def remove(self, statement_text):
         """
         Removes the statement that matches the input text.
@@ -389,3 +429,44 @@ class SQLStorageAdapter(StorageAdapter):
             self.logger.exception(statement_text)
         finally:
             session.close()
+
+    def find_within_channel(self, channel_id):
+        from sqlalchemy import desc
+        from chatterbot.ext.sqlalchemy_app.models import Sentence
+
+        session = self.Session()
+        sentence = session.query(Sentence).filter_by(
+            channel=channel_id
+        ).order_by(desc(Sentence.id)).first()
+        if sentence is None:
+            return None
+        text = sentence.text
+        session.close()
+        return text
+
+    def delete_within_channel(self, channel_id):
+        from chatterbot.ext.sqlalchemy_app.models import Sentence
+
+        session = self.Session()
+        session.query(Sentence).filter_by(
+            channel=channel_id
+        ).delete()
+
+        self._session_finish(session)
+
+    def update_sentence_with_channe(self, text, channel_id):
+        from chatterbot.ext.sqlalchemy_app.models import Sentence
+        from sqlalchemy import desc
+
+        session = self.Session()
+        sentence = session.query(Sentence).filter_by(
+            channel=channel_id
+        ).order_by(desc(Sentence.id)).first()
+        if sentence is None:
+            new_sentence = Sentence(text=text, channel=channel_id)
+            session.add(new_sentence)
+        else:
+            sentence.text = sentence.text + text
+        self._session_finish(session)
+        return
+
