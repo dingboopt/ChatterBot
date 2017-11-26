@@ -177,7 +177,7 @@ class SQLStorageAdapter(StorageAdapter):
             new_sentence = Sentence(text=text, channel=channel_id)
             session.add(new_sentence)
         else:
-            sentence.text = sentence.text + text
+            sentence.text = sentence.text + ',' + text
         self._session_finish(session)
         return
 
