@@ -426,6 +426,7 @@ class WechatTrainer(Trainer):
 
         # reply, learn
         if me:
+            self.logger.info(u'receive statement')
             channel = msg['ToUserName']
             previous_statement_text = self.storage.find_within_channel(channel)
             # store in statement if previous one is a response of mine
@@ -435,8 +436,11 @@ class WechatTrainer(Trainer):
                     Response(previous_statement_text)
                 )
                 self.storage.update(statement)
+                previous_statement = self.get_or_create(previous_statement_text)
+                self.storage.update(previous_statement)
             self.storage.delete_within_channel(channel)
         #receive message
         else:
+            self.logger.info(u'store statement')
             channel = msg['FromUserName']
             self.storage.update_sentence_with_channe(msg['Text'], channel)
